@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Clientes</title>
+</head>
+<body>
+    <h2>Gestão de Cliente</h2>
+    
+    <form id="formCliente">
+        <input type="hidden" name="acao" id="acao" value="cadastrar">
+        <input type="hidden" name="id" id="cliente_id" value="">
+        
+        <input type="text" name="nome" id="nome" placeholder="Nome Completo" required><br><br>
+        <input type="text" name="cpf" id="cpf" placeholder="CPF" required><br><br>
+        <input type="text" name="telefone" id="telefone" placeholder="Telefone" required><br><br>
+        <input type="text" name="endereco" id="endereco" placeholder="Endereço"><br><br>
+        
+        <button type="submit" id="btnSalvar">Salvar Cliente</button>
+        <button type="button" onclick="cancelarEdicao()" style="display:none;" id="btnCancelar">Cancelar Edição</button>
+    </form>
+
+    <hr>
+
+    <h2>Lista de Clientes</h2>
+    <ul id="listaClientes"></ul>
+
+    <script>
+        const form = document.getElementById('formCliente');
+
+        // FUNÇÃO: SALVAR (CADASTRAR OU EDITAR)
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            let formData = new FormData(this);
+
+            fetch('backend/api_clientes.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.mensagem);
+                if(data.status === 'sucesso') {
+                    cancelarEdicao(); // Limpa o form e volta para modo cadastro
+                    listarClientes();
+                }
+            });
+        });
+
+        // FUNÇÃO: LISTAR
+        function listarClientes() {
+            fetch('backend/api_clientes.php?acao=listar')
+            .then(response => response.json())
+            .then(clientes => {
+                let lista = document.getElementById('listaClientes');
+                lista.innerHTML = ''; 
+                
+                clientes.forEach(cliente => {
+                    let item = document.createElement('li');
+                    item.innerHTML = `
+                        <strong>${cliente.nome}</strong> - CPF: ${cliente.cpf} - Tel: ${cliente.telefone}
+                        <button onclick="prepararEdicao(${cliente.id}, '${cliente.nome}', '${cliente.cpf}', '${cliente.telefone}', '${cliente.endereco}')">Editar</button>
+                        <button onclick="excluirCliente(${cliente.id})">Excluir</button>
+                    `;
+                    lista.appendChild(item);
+                });
+            });
+        }
+
+        // FUNÇÃO: PREPARAR EDIÇÃO (Joga os dados pro formulário)
+        function prepararEdicao(id, nome, cpf, telefone, endereco) {
+            document.getElementById('acao').value = 'editar';
+            document.getElementById('cliente_id').value = id;
+            document.getElementById('nome').value = nome;
+            document.getElementById('cpf').value = cpf;
+            document.getElementById('telefone').value = telefone;
+            document.getElementById('endereco').value = endereco;
+            
+            document.getElementById('btnSalvar').innerText = "Atualizar Cliente";
+            document.getElementById('btnCancelar').style.display = "inline-block";
+        }
+
+        // FUNÇÃO: CANCELAR EDIÇÃO (Limpa o form)
+        function cancelarEdicao() {
+            form.reset();
+            document.getElementById('acao').value = 'cadastrar';
+            document.getElementById('cliente_id').value = '';
+            document.getElementById('btnSalvar').innerText = "Salvar Cliente";
+            document.getElementById('btnCancelar').style.display = "none";
+        }
+
+        // FUNÇÃO: EXCLUIR
+        function excluirCliente(id) {
+            if(confirm("Tem certeza que deseja excluir este cliente?")) {
+                let formData = new FormData();
+                formData.append('acao', 'excluir');
+                formData.append('id', id);
+
+                fetch('backend/api_clientes.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.mensagem);
+                    listarClientes();
+                });
+            }
+        }
+
+        // Carrega a lista ao abrir a página
+        window.onload = listarClientes;
+    </script>
+</body>
+</html>

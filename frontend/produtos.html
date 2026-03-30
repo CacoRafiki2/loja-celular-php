@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Produtos</title>
+</head>
+<body>
+    <h2>Gestão de Produtos</h2>
+    
+    <form id="formProduto">
+        <input type="hidden" name="acao" id="acao" value="cadastrar">
+        <input type="hidden" name="id" id="produto_id" value="">
+        
+        <input type="text" name="nome" id="nome" placeholder="Nome do Produto/Acessório" required><br><br>
+        <input type="text" name="marca" id="marca" placeholder="Marca"><br><br>
+        <input type="number" step="0.01" name="preco" id="preco" placeholder="Preço (Ex: 150.00)" required><br><br>
+        <input type="number" name="estoque" id="estoque" placeholder="Quantidade em Estoque" required><br><br>
+        
+        <button type="submit" id="btnSalvar">Salvar Produto</button>
+        <button type="button" onclick="cancelarEdicao()" style="display:none;" id="btnCancelar">Cancelar Edição</button>
+    </form>
+
+    <hr>
+
+    <h2>Lista de Produtos</h2>
+    <ul id="listaProdutos"></ul>
+
+    <script>
+        const form = document.getElementById('formProduto');
+
+        // FUNÇÃO: SALVAR (CADASTRAR OU EDITAR)
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            let formData = new FormData(this);
+
+            fetch('backend/api_produtos.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.mensagem);
+                if(data.status === 'sucesso') {
+                    cancelarEdicao(); 
+                    listarProdutos();
+                }
+            });
+        });
+
+        // FUNÇÃO: LISTAR
+        function listarProdutos() {
+            fetch('backend/api_produtos.php?acao=listar')
+            .then(response => response.json())
+            .then(produtos => {
+                let lista = document.getElementById('listaProdutos');
+                lista.innerHTML = ''; 
+                
+                produtos.forEach(produto => {
+                    let item = document.createElement('li');
+                    item.innerHTML = `
+                        <strong>${produto.nome} (${produto.marca})</strong> - Preço: €${produto.preco} - Estoque: ${produto.estoque} un.
+                        <button onclick="prepararEdicao(${produto.id}, '${produto.nome}', '${produto.marca}', '${produto.preco}', '${produto.estoque}')">Editar</button>
+                        <button onclick="excluirProduto(${produto.id})">Excluir</button>
+                    `;
+                    lista.appendChild(item);
+                });
+            });
+        }
+
+        // FUNÇÃO: PREPARAR EDIÇÃO
+        function prepararEdicao(id, nome, marca, preco, estoque) {
+            document.getElementById('acao').value = 'editar';
+            document.getElementById('produto_id').value = id;
+            document.getElementById('nome').value = nome;
+            document.getElementById('marca').value = marca;
+            document.getElementById('preco').value = preco;
+            document.getElementById('estoque').value = estoque;
+            
+            document.getElementById('btnSalvar').innerText = "Atualizar Produto";
+            document.getElementById('btnCancelar').style.display = "inline-block";
+        }
+
+        // FUNÇÃO: CANCELAR EDIÇÃO
+        function cancelarEdicao() {
+            form.reset();
+            document.getElementById('acao').value = 'cadastrar';
+            document.getElementById('produto_id').value = '';
+            document.getElementById('btnSalvar').innerText = "Salvar Produto";
+            document.getElementById('btnCancelar').style.display = "none";
+        }
+
+        // FUNÇÃO: EXCLUIR
+        function excluirProduto(id) {
+            if(confirm("Tem a certeza que deseja excluir este produto?")) {
+                let formData = new FormData();
+                formData.append('acao', 'excluir');
+                formData.append('id', id);
+
+                fetch('backend/api_produtos.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.mensagem);
+                    listarProdutos();
+                });
+            }
+        }
+
+        // Carrega a lista ao abrir a página
+        window.onload = listarProdutos;
+    </script>
+</body>
+</html>
