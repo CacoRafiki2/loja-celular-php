@@ -30,14 +30,14 @@ try {
     // 5. Mensagem de Sucesso (Alerta na tela)
     echo "<script>
             alert('Cliente $nome cadastrado com sucesso!');
-            window.location.href = 'index.html';
+            window.location.href = 'cadastro_cliente.html';
           </script>";
 
 } catch (PDOException $e) {
     // 6. Mensagem de Erro (Alerta na tela)
     echo "<script>
             alert('Erro ao cadastrar: " . $e->getMessage() . "');
-            window.location.href = 'index.html';
+            window.location.href = 'cadastro_cliente.html';
           </script>";
 }
 ?>
