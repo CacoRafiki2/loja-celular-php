@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Serviços</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f6f9; }
+        .cabecalho { display: flex; justify-content: space-between; align-items: center; max-width: 450px; margin-bottom: 20px; }
+        h2 { color: #2c3e50; margin: 0; }
+        .btn-listar { background-color: #7f8c8d; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; transition: 0.3s; }
+        .btn-listar:hover { background-color: #95a5a6; }
+        form { max-width: 450px; padding: 25px; background-color: white; border: 1px solid #ecf0f1; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; font-size: 14px; }
+        input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { margin-top: 20px; padding: 12px 15px; background-color: #27ae60; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; width: 100%; transition: 0.3s; }
+        button:hover { background-color: #219150; }
+    </style>
+</head>
+<body>
+
+    <div class="cabecalho">
+        <h2>🛠️ Novo Serviço</h2>
+        <a href="listar_servicos.php" class="btn-listar">📋 Listar Serviços</a>
+    </div>
+    
+    <form action="inserir_servico.php" method="POST">
+        
+        <label for="descricao">Descrição do Serviço:</label>
+        <input type="text" id="descricao" name="descricao" placeholder="Ex: Troca de Tela iPhone 13" required>
+
+        <label for="preco_base">Preço Base (R$):</label>
+        <input type="number" id="preco_base" name="preco_base" step="0.01" required>
+
+        <button type="submit">Registar Serviço</button>
+    </form>
+
+</body>
+</html>
