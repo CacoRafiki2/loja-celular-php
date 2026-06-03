@@ -4,6 +4,8 @@ if (!isset($_SESSION['usuario_logado'])) {
     header("Location: login.php");
     exit;
 }
+// Pega o perfil do crachá. Se não tiver, vira comum por segurança.
+$perfil = $_SESSION['perfil'] ?? 'comum';
 ?>
 
 <!DOCTYPE html>
@@ -81,7 +83,7 @@ if (!isset($_SESSION['usuario_logado'])) {
         <a href="listar_clientes.php" target="tela_principal">
             <img src="img/icone-cliente.png" alt="Icone Cliente"> Gestão de Clientes
         </a>
-        <a href="#" target="tela_principal">
+        <a href="listar_os.php" target="tela_principal">
             <img src="img/icone-venda.png" alt="Icone Vendas"> Vendas e OS
         </a>
         <a href="listar_produtos.php" target="tela_principal">
@@ -90,6 +92,12 @@ if (!isset($_SESSION['usuario_logado'])) {
         <a href="listar_servicos.php" target="tela_principal">
             <img src="img/icone-servico.png" alt="Icone Serviço"> Catálogo de Serviços
         </a>
+        
+        <?php if($perfil === 'admin'): ?>
+            <a href="listar_usuarios.php" target="tela_principal" style="background-color: #34495e;">
+                ⚙️ Gestão de Usuários
+            </a>
+        <?php endif; ?>
         
         <a href="logout.php" class="btn-logout" target="_top">🚪 Sair do Sistema</a>
     </div>
